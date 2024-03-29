@@ -79,5 +79,11 @@ body,
   }
   body {
     @apply bg-background text-foreground;
+  } 
+}
+
+@layer utilities {
+  .gradient-sky {
+    @apply bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-400 to-blue-800;
   }
 }
