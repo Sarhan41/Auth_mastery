@@ -51,7 +51,7 @@ export const LoginForm = () => {
       login(values).then((data) => {
         setError(data?.error);
         // todo: Add when we add 2 factor Authentication
-        // setSuccess(data?.success);
+        setSuccess(data?.success);
       });
     });
   };

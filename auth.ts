@@ -25,6 +25,23 @@ export const {
     },
   },
   callbacks: {
+    async signIn({ user, account }) {
+      // Allow OAuth without email verification
+      if (account?.provider !== "credentials") return true;
+
+      if (!user.id) return false;
+
+      const existingUser = await getUserById(user.id);
+
+      //? This is all for preventing user to signin without email verification
+      if (!existingUser?.emailVerified) {
+        return false;
+      }
+
+      //todo: Add 2 factor Authentication
+
+      return true;
+    },
     async session({ token, session }) {
       console.log({
         sessiontoken: token,
