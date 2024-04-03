@@ -2,6 +2,7 @@
 
 import * as z from "zod";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -50,7 +51,7 @@ export const LoginForm = () => {
     startTransition(() => {
       login(values).then((data) => {
         setError(data?.error);
-        // todo: Add when we add 2 factor Authentication
+        // todo: Add when we add 2 factor Authentication 
         setSuccess(data?.success);
       });
     });
@@ -98,6 +99,11 @@ export const LoginForm = () => {
                       type="password"
                     />
                   </FormControl>
+                  <Button size="sm" variant="link" asChild className="px-0 font-normal" >
+                    <Link href="/auth/reset" >
+                      Forgot password?
+                    </Link>
+                  </Button>
                   <FormMessage />
                 </FormItem>
               )}
