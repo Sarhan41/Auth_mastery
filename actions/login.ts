@@ -6,20 +6,20 @@ import { AuthError } from "next-auth";
 import { db } from "@/lib/db";
 import { signIn } from "@/auth";
 import { LoginSchema } from "@/schemas";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { getUserByEmail } from "@/data/user";
+import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { sendVerificationEmail, sendTwoFactorTokenEmail } from "@/lib/mail";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import {
   generateVerificationToken,
   generateTwoFactorToken,
 } from "@/lib/tokens";
-import {
-  getTwoFactorTokenByEmail,
-  getTwoFactorTokenByToken,
-} from "@/data/two-factor-token";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 
-export const login = async (values: z.infer<typeof LoginSchema>) => {
+export const login = async (
+  values: z.infer<typeof LoginSchema>,
+  callbackUrl?: string | null
+) => {
   const validatedFields = LoginSchema.safeParse(values);
 
   if (!validatedFields.success) {
@@ -87,15 +87,16 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     } else {
       const twoFactorToken = await generateTwoFactorToken(existingUser.email);
       await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
+
+      return { twoFactor: true };
     }
-    return { twoFactor: true };
   }
 
   try {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: DEFAULT_LOGIN_REDIRECT,
+      redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -106,6 +107,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
           return { error: "Something went wrong!" };
       }
     }
+
     throw error;
   }
 };
